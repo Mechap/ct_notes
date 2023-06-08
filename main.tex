@@ -1,0 +1,587 @@
+\documentclass[justified]{tufte-handout}
+\usepackage[fontsize=8pt]{fontsize}
+
+\usepackage{comment}
+
+\begin{comment}
+\makeatletter % Paragraph indentation and separation for normal text
+\renewcommand{\@tufte@reset@par}{%
+	\setlength{\RaggedRightParindent}{0pc}%
+	\setlength{\JustifyingParindent}{0pc}%
+	\setlength{\parindent}{0pc} \setlength{%
+		\parskip}{0pt} } \@tufte@reset@par%
+
+% Paragraph indentation and separation for marginal text
+\renewcommand{\@tufte@margin@par}{%
+	\setlength{\RaggedRightParindent}{0pc}%
+	\setlength{\JustifyingParindent}{0pc}%
+	\setlength{\parindent}{0pc} \setlength{%
+		\parskip}{0pt} } \makeatother%
+\end{comment}
+
+\renewcommand\allcapsspacing[1]{{\addfontfeature{LetterSpace=15}#1}}
+\renewcommand\smallcapsspacing[1]{{\addfontfeature{LetterSpace=10}#1}}
+
+\newcommand\scalemath[2]{\scalebox{#1}{\mbox{\ensuremath{\displaystyle #2}}}}
+
+\usepackage[french]{babel}
+
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsthm}
+
+\usepackage{mathpartir}
+
+\usepackage{luamplib}
+\everymplib{ beginfig(0); }
+\everyendmplib{ endfig; }
+
+\usepackage{unicode-math}
+\usepackage{libertinus-otf}
+\usepackage[Libertinus]{mycd}
+%\setmainfont{LinLibertine_Rah.ttf}[Ligatures={Common,Rare,TeX}, Numbers=OldStyle]
+%\setmathfont{LibertinusMath-Regular.otf}
+%\setmonofont{JuliaMono-Bold.ttf}
+
+%\usepackage{tcolorbox}
+%\newtcolorbox{defbox}{
+%    colback=yellow!4!white,
+%    boxrule=0.5pt,
+%    sharp corners,
+%}
+
+\usepackage{tikz}
+\usepackage{tikz-cd}
+\tikzcdset{ arrow style=math font, diagrams={>=stealth}}
+
+\newtheorem{definition}{Définition}
+\newtheorem{prop}{Proposition}
+
+\def\msf{\mathsf}
+\def\mbf{\mathbold}
+\def\mbbf{\mathbb}
+\def\mcf{\mathcal}
+
+\title{\huge Théorie des catégories, Notes}
+\author{mechap}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+	La théorie des catégories étudie les structures mathématiques et leurs relations.
+	En ce sens, nous pouvons la voir comme un ensemble d'outils permettant de décrire des correspondances et relations que des structures mathématiques abstraites entretiennent.
+	Il s'agit donc à l'instar de la théorie des ensembles non pas de se focaliser sur des éléments appelés objets mais bien sur les relations entre ces objets : les homomorphismes entre eux.
+
+	Ce document constitue un recueil de mes notes et pensées sur ce sujet. En ce
+	sens, les références ainsi que les analogies qui y seront établies seront
+	subjectives.
+\end{abstract}
+
+\hrulefill
+
+\section{Introduction}
+
+Une catégorie n'est pas moins qu'une généralisation d'un multigraphe, i.e., une
+classe d'objets et de morphismes entre eux.
+
+\marginnote{Une catégorie est dite « petite » si $\msf{Ob}(C)$ et $\msf{Mor}(C)$ sont des ensembles.
+	Dans le cas contraire, $C$ est une catégorie « large ».
+	Similairement, une catégorie $C$ est localement petite si pour tout objets $X, Y \in C$, la collection $\msf{Hom}_C(X, Y)$ des morphismes $X \rightarrow Y$ est un ensemble.
+}
+\begin{definition}[Catégories]
+	Une catégorie $C$ est une classe d'objets $\msf{Ob}(C)$ et de morphismes $\msf{Mor}(C)$ satisfaisant :
+	\begin{itemize}
+		\item[(i)] Pour chaque morphisme $f$, il y a des objets $\msf{dom}(f) = A$ et $\msf{cod}(f) = B$ appelés respectivement domaine et codomaine de $f$.
+			Dans ce cas, nous écrivons $f : A \rightarrow B$.
+		\item[(ii)] Soit deux morphismes $f : A \rightarrow B$ et $g : B \rightarrow C$, il existe un morphisme $g \circ f : A \rightarrow C$, i.e., la composition de $f$ et $g$.
+		\item[(iii)] Soit un objet $A$, il existe un morphisme identité $1_A : A \rightarrow A$ de telle sorte que pour tout morphisme $f : A \rightarrow$, $f \circ 1_a = f = 1_B \circ f$.
+		\item[(iv)] La composition de morphisme est associative : soit trois morphismes $f : A \rightarrow B$, $g : B \rightarrow C$, et $h : C \rightarrow D$ \[ (f \circ g) \circ h = f \circ (g \circ h) \]
+	\end{itemize}
+\end{definition}
+
+\marginnote{
+	\begin{itemize}
+		\item[$\bullet$] Les isomorphismes dans la catégorie $\msf{Set}$ des ensembles sont précisément des bijections.
+		\item[$\bullet$] Les isomorphismes dans $\msf{Group}$, $\msf{Ring}$, $\msf{Field}$ sont des homomorphismes bijectifs.
+		\item[$\bullet$] Les isomorphismes dans la catégories $\msf{Top}$ des espaces topologiques sont des homéomorphismes, i.e., des applications continues avec des inverses continus.
+			C'est une propriété plus restrictive qu'une simple bijection continue.
+		\item[$\bullet$] Les isomorphismes dans la catégorie $\msf{Htpy}$ sont des équivalences homotopiques.
+	\end{itemize}
+}
+\begin{definition}[Isomorphismes d'objets]
+	Soit $C$ une catégorie, un morphisme $f : A \rightarrow B$ est un isomorphisme si et seulement si il existe un morphisme $g : B \rightarrow A$ satisfaisant $f \circ g = 1_B$ et $g \circ f = 1_A$.
+	Dans ce cas, $f$ et $g$ sont des inverses (on considère que $f^{-1} = g$) et $A$ est isomorphe à $B$ ($A \simeq B$).
+\end{definition}
+
+Un exemple de catégorie essentiel est l'ensemble partiellement ordonné :
+$\msf{Poset}$. Par conséquent, les objets de cette catégorie sont simplement
+les élément de l'ensemble, et les morphismes $f : x \rightarrow y$
+correspondent à la relation d'équivalence $x \leq y$.
+
+\vspace{5pt}
+
+Ce sera également utile de définir les catégories suivantes : $\msf{0}$ est la
+catégorie vide (ne possédant aucun objets et morphismes\sidenote{Par analogie
+	avec la théorie des types dépendants, où $\msf{0}$ est le type ne possédant
+	aucun élément.
+
+	Par l'isomorphisme de Curry Howard, \centering\inferrule{\Gamma \vdash P : A
+		\rightarrow \mathcal{U}}{\Gamma \vdash f : \prod_{a : A} P(a) \rightarrow 0} \\
+	ne peut être inféré. }), $\msf{1}$ est la catégorie avec un seul objet et le
+morphisme identité et $\msf{2}$, la catégorie représentant par le diagramme
+suivant.
+
+\begin{center}
+	\begin{tikzcd}
+		A \arrow[r, "f"]\arrow[loop left, "\msf{id}_A"] & B \arrow[loop right, "\msf{id}_B"]
+	\end{tikzcd}
+\end{center}
+
+Enfin, un groupe individuel est lui-même une catégorie avec exactement un seul
+objet, où tous les morphismes sont des isomorphismes. Soit un groupe $G$, cette
+catégorie est notée $\mbf{B}G$.
+
+Par exemple, la catégorie $\mbf{B}\{1\}$ (où $\{1\}$ est le groupe trivial) est
+$\mbf{1}$ et la catégorie $\mbf{B}V_4$ (où $V_4$ est le 4-groupe de Klein) est
+:
+
+\begin{center}
+	\begin{tikzcd}
+		G \arrow[loop left, "ab"] \arrow[loop right, "b"] \arrow[loop below, "a"] \arrow[loop above, "\msf{1}"]
+	\end{tikzcd}
+\end{center}
+
+\begin{definition}[Catégorie opposé]
+	Soit $C$ une catégorie.
+	La catégorie opposée $C^{\msf{op}}$ possède les mêmes objets et morphismes que $C$.
+	Soit $f^{\msf{op}}$ le morphisme dans $C^{\msf{op}}$ correspondant au morphisme dans $C$ :
+	\begin{itemize}
+		\item[(i)] Le domaine de $f^{\msf{op}}$ est le codomaine de $f$ et le codomaine de $f^{\msf{op}}$ est le domaine de $f$.
+		\item[(ii)] Pour chaque objet $X$, le morphisme $\msf{1}_X^{\msf{op}}$ est le morphisme identité dans $C^{\msf{op}}$.
+		\item[(iii)] Pour définir une composition, on peut observer qu'une paire de morphismes $f^{\msf{op}}$, $g^{\msf{op}}$ dans $C^{\msf{op}}$ peut se voir appliquer une composition précisément lorsque la paire $f, g$ est composable dans $C$.
+	\end{itemize}
+\end{definition}
+
+Par exemple, si $G$ peut être vue comme un groupoïde \sidenote{ Un groupoïde
+est une catégorie dans laquelle tous les morphismes sont des isomorphismes.
+
+Par exemple, nous pouvons étendre la notion de groupe fondamental au sens
+catégorique, pour n'importe quel espace $X$, son groupoïde fondamental
+$\Pi_1(X)$ est une catégorie dont les objets sont les points de $X$ et dont les
+morphismes de $x$ à $y$ sont les classes d'homotopies $[\gamma]$ des
+applications continues $\gamma : [0,1] \rightarrow X$ dont les points
+d'extrémités correspondent à $x$ et $y$. La composition correspond à la
+concaténation de chemins et est associative sous équivalence homotopique.
+
+\vspace{5pt}
+
+Puisque $\Pi_1(X)$ est un groupoïde, on peut définir le groupe fondamental
+$\pi_1(X, x)$ comme le groupe des automorphismes de $x$ dans $\Pi_1(X)$
+\[ \pi_1(X, x) := \mathsf{Aut}_{\Pi_1(X)}(x) \]
+Nous verrons dans la partie concernant les foncteurs que ces deux constructions
+sont des foncteurs de catégories. } à un seul objet, sa catégorie opposée
+$G^{\msf{op}}$ peut également considéré de cette manière. Ce groupe est appelé
+le \flqq{} groupe opposé \frqq{}, et possède certaines propriétés
+intéressantes.
+
+\begin{definition}[Catégorie de morphisme]
+	La catégorie de morphisme $C^{\rightarrow}$ d'une catégorie $C$ est définie par $\msf{Ob}(C^\rightarrow) = \msf{Mor}(C)$, i.e., elle a pour objets les morphismes de $C$.
+	Un morphisme $g$ de $f : A \rightarrow B$ à $f' : A' \rightarrow B'$ est une paire de morphismes $(g_1, g_2)$ dans $C$ telle que $g_2 \circ f = f' \circ g_1$.
+
+	\begin{center}
+		\begin{tikzcd}
+			a \arrow[r, "g_1"] \arrow[d, "f", swap] & A' \arrow[d, "f'"] \\
+			B \arrow[r, "g_2", swap] & B'
+		\end{tikzcd}
+	\end{center}
+
+	La composition est définie en plaçant ces carrés commutatifs côtes à côtes.
+\end{definition}
+
+\begin{definition}[Sous-catégorie]
+	Une sous-catégorie $D$ d'une catégorie $C$ est définie en limitant $C$ à une sous collection d'objets et de morphismes sous réserve que la sous-catégorie $D$ contienne le domaine et le codomaine de tout morphisme dans $D$, le morphisme identité de tout objet dans $D$ ainsi que la composition de tout couples de morphismes dans $D$.
+\end{definition}
+
+Par exemple, toute catégorie $C$ possède un sous-groupoïde maximal contenant
+tous les objets et morphismes qui sont des isomorphismes. La catégorie
+$\msf{Fin}_\msf{iso}$ des ensembles finis avec bijections est la
+sous-collection maximum de la catégorie $\msf{Fin}$ des ensembles finis avec
+toutes les fonctions.
+
+\section{Types de morphismes}
+
+\marginnote{
+	\begin{prop}
+		Tout isomorphisme est un bismorphisme.
+		Plus généralement, toute rétraction est un monomorphisme et toute section est un épimorphisme.
+		Néanmoins, tous les bimorphismes ne sont pas forcément des isomorphismes.
+	\end{prop}
+
+	Les deux premières parties de la proposition sont triviales. Un exemple de
+	bimorphisme qui n'est pas un isomorphisme est l'inclusion $\mathbb{Z}
+		\hookrightarrow \mathbb{Q}$ dans la catégorie des anneaux $\msf{Rings}$. C'est
+	bien un bimorphisme mais pas un isomorphisme. }
+
+\begin{definition}[Monomorphismes et Épimorphismes]
+	La notion de monomorphisme généralise la notion d'application injective dans $\msf{Set}$ pour n'importe quelle catégorie et est duale à la notion d'épimorphisme qui généralise la notion de surjection.
+
+	\begin{itemize}
+		\item[(i)] Un morphisme $f : X \rightarrow Y$ dans une catégorie $C$ est un monomorphisme si pour tout objet $Z$ et toute paire de morphismes parallèles $g_1, g_2 : Z \rightarrow X$ alors \[ (f \circ g_1 = f \circ g_2) \implies (g_1 = g_2) \]
+			ou autrement dit que \[ \msf{Hom}(Z, X) \overset{f}{\hookrightarrow} \msf{Hom}(Z, Y) \]
+
+		\item[(ii)] Un morphisme $f : X \rightarrow Y$ dans une catégorie $C$ est un épimorphisme si pour tout objet $Z$ et toute paire de morphismes parallèles $g_1, g_2 : Z \rightarrow X$ alors \[ (g_1 \circ f = g_2 \circ f) \implies (g_1 = g_2) \]
+			ou autrement dit que \[ \msf{Hom}(Y, Z) \overset{f}{\hookrightarrow} \msf{Hom}(X, Z) \]
+	\end{itemize}
+\end{definition}
+
+Un morphisme satisfaisant ces deux définitions est un bimorphisme.
+
+\marginnote{
+	En quelques mots, un foncteur est un morphisme entre catégories.
+	En particulier, toute catégorie possède un foncteur identité $1_C : C \rightarrow C$.
+	Ainsi, nous pouvons définir $\msf{Cat}$ telle que la catégorie de toutes les catégorie petites avec des foncteurs entre elles.
+
+	\hrulefill
+
+	Un exemple de foncteur que nous avons déjà rencontré est avec pour image le
+	groupe fondamental d'un espace
+	\[ \pi_1 : \msf{Top} \rightarrow \msf{Group} \]
+
+	Le foncteur $F : \msf{Set} \rightarrow \msf{Group}$ ayant pour image le groupe
+	libre d'un ensemble est un autre exemple. C'est le groupe dont les éléments
+	sont des \flqq{} mots \frqq{} finis dont les lettres sont des éléments $x \in
+		X$ ou leurs inverses formels $x^{-1}$, modulo une relation d'équivalence qui
+	égalise les mots $xx^{-1}$ avec le mot nul. La multiplication est définie par
+	concaténation. }
+\begin{definition}[Rétractions et Sections]
+	Un morphisme est une rétraction s'il possède un inverse à gauche et une section s'il possède un inverse à droite.
+\end{definition}
+
+Notons que dans $\msf{Set}$, les monomorphismes sont exactement des rétractions
+(i.e. des fonctions injectives) et les épimorphismes exactement des section
+(i.e. des fonctions surjectives).
+
+\section{Foncteurs}
+
+\begin{definition}[Foncteur covariant]
+	Un foncteur covariant (ou simplement un foncteur) $F : C \rightarrow D$ entre deux catégories $C$ et $D$ est une application $\msf{Ob}(C)$ \rightarrow $\msf{Ob}(D)$ et $\msf{Mor}(C) \rightarrow \msf{Mor}(D)$ tels que :
+
+	\begin{align*}
+		F(f : A \rightarrow B) & = F : F(A) \rightarrow F(B) \\
+		F(1_A)                 & = 1_{F(A)}                  \\
+		F(g \circ f)           & = F(g) \circ F(f)
+	\end{align*}
+\end{definition}
+
+\begin{definition}[Catégories isomorphes]
+	Deux catégories $C$ et $D$ sont isomorphes , s'il existe des foncteurs $F : C \rightarrow D$ et $G : D \rightarrow C$ qui sont inverses ($F \circ G = 1_D$ et $G \circ F = 1_C$).
+	En particulier, un foncteur est un isomorphisme si et seulement si il est bijective sur la classe des des objets et la classe des morphismes.
+\end{definition}
+
+\marginnote{
+	\begin{prop}
+		Les foncteurs préservent la commutativité dans les diagrammes.
+	\end{prop}
+	Un diagramme dans $C$ est donné par le foncteur $F : J \rightarrow C$, dont le domaine est une petite catégorie.
+	Soit $G : C \rightarrow D$, la composante de $GF : J \rightarrow D$ définit l'image du diagramme dans $D$.
+}
+\begin{itemize}
+	\item[$\bullet$] $F$ est injectif sur les objets d'une catégorie si l'application $F_O : \msf{Ob}(C) \rightarrow \msf{Ob}(D)$ est injective.
+	\item[$\bullet$] $F$ est surjectif sur les objets d'une catégorie si l'application $F_O : \msf{Ob}(C) \rightarrow \msf{Ob}(D)$ est surjectif.
+
+		\vspace{5pt}
+
+	\item[$\bullet$] $F$ est injectif sur les morphismes d'une catégorie si l'application $F_O : \msf{Ob}(C) \rightarrow \msf{Ob}(D)$ est injective.
+	\item[$\bullet$] $F$ est surjectif sur les morphismes d'une catégorie si l'application $F_O : \msf{Ob}(C) \rightarrow \msf{Ob}(D)$ est surjectif.
+\end{itemize}
+
+Un diagramme dans une catégorie $C$ est un foncteur $F : J \rightarrow C$ dont
+le domaine, la catégorie indexée \sidenote{En pratique, on peut considérer une
+	catégorie indexée comme un graphe orienté définissant la \flqq{} forme \frqq{}
+	du diagramme.
+
+	Par exemple, pour définir un foncteur avec $\msf{2} \times \msf{2}$ en domaine,
+	il suffit de spécifier les images des quatres objets ainsi que leurs morphismes
+	associés
+	\begin{center}
+		\begin{tikzcd}[ampersand replacement=\&]
+			a \arrow[r, "f"] \arrow[d, "g", swap] \& b \arrow[d, "h"] \\
+			c \arrow[r, "k", swap] \& d
+		\end{tikzcd}
+	\end{center}
+
+	sujets à la relation $hf = kg$ } , est une catégorie petite. Un diagramme est
+typiquement représenté en dessinant les objets et les morphismes dans son image
+(avec la catégorie domaine implicite).
+
+\vspace{5pt}
+Considérons $\msf{2} \times \msf{2}$, la catégorie avec quatre objets et les morphismes (non-identités) suivants :
+\begin{center}
+	\begin{tikzcd}
+		● \arrow[r] \arrow[d] & ● \arrow[d] \\
+		● \arrow[r] & ●
+	\end{tikzcd}
+\end{center}
+
+Dans $\msf{2} \times \msf{2}$, le morphisme diagonal est à la fois la
+composition des morphismes haut et droit et des morphismes gauche et bas. Un
+tel diagramme est dit un carré commutatif et de manière générale un diagramme
+est dit commutatif lorsque tous ses chemins avec les mêmes points de départ et
+d'arrivés donnent un même résultat.
+
+\hrulefill
+
+\begin{prop}[Théorème du point fixe]
+	Toute endomorphisme continu d'un 2-disque possède un point fixe.
+\end{prop}
+
+% TODO: diagram
+\marginnote{
+	\mplibforcehmode
+	\mplibtextextlabel{enable}
+	\begin{center}
+		\begin{mplibcode}
+			path circle; circle = fullcircle scaled 2cm;
+			draw circle;
+			dotlabel.top("$f(x)$", (-0.3cm, -0.4cm));
+			path arr; arr = (-0.3cm, -0.4cm) -- (1.6cm, 0.2cm);
+			drawarrow arr;
+			dotlabel.top("$x$", point 1/3 of arr);
+			dotlabel.lrt("$r(x)$", arr intersectionpoint circle);
+		\end{mplibcode}
+	\end{center}
+}
+
+Cela peut être déduit plus ou moins immédiatement à partir de la fonctorialité
+du groupe fondamental \[ \pi_1 : \msf{Top} \rightarrow \msf{Group} \]
+Soit $f : D^2 \rightarrow D^2$ tel que $\forall x \in D^2,\ f(x) \neq x$, on
+peut définir une fonction continue $r : D^2 \rightarrow S^1$ qui transporte un
+point $x \in D^2$ à l'intersection de la tangente de $f(x)$ à $x$ avec la
+frontière de $S^1$. Ainsi, c'est une rétraction de l'inclusion $i : S^1
+	\hookrightarrow D^2$, ce qui revient à dire que \[ S^1 \xrightarrow{i} D^2 \xrightarrow{r} S^1 \] est une fonction identité. \vspace{5pt}
+
+\marginnote{
+	\begin{prop}
+		Les foncteur préservent les isomorphismes.
+	\end{prop}
+
+	Considérons un foncteur $F : C \rightarrow D$ et un isomorphisme $f : x
+		\rightarrow y$ avec un inverse $g : y \rightarrow x$. En appliquant
+	l'axiomatique des foncteurs, nous obtenons :
+	\[ F(g)F(f) = F(gf) = F(1_x) = 1_{Fx} \]
+
+	Ainsi, $Fg : Fy \rightarrow Fx$ est un inverse gauche de $Ff : Fx \rightarrow
+		Fy$. Par dualité, $Fg$ est un inverse droit. }
+
+En prenant n'importe quel point de base sur la frontière de $S^1$ et en
+appliquant $\pi_1$, on obtient la paire d'homomorphisme de groupes : \[ \pi_1(S^1) \xrightarrow{\pi_1(i)} \pi_1(D^2) \xrightarrow{\pi_1(r)} \pi_1(S^1) \]
+
+Par les axiomes de fonctorialité, nous devons avoir \[ \pi_1(r) \cdot \pi_1(i) = \pi_1(ri) = \pi_1(1_{s^1}) = 1_{\pi_1(S^1)} \]
+
+Cependant, on sait que $\pi_1(S^1) = \mbbf{Z}$ tandis que $\pi_1(D^2) =
+	\msf{0}$, le groupe trivial. La composition d'endomorphismes $\pi_1(r) \cdot
+	\pi_1(i)$ de $\mbbf{Z}$ doit être $\msf{0}$, puisque cela se factorise à
+travers le groupe trivial.
+
+Ainsi, cela ne peut valoir le morphisme identité qui associe le générateur $1
+	\in \mbbf{Z}$ à lui-même ($0 \neq 1$). Cette contradiction démontre que la
+rétraction $r$ ne peut exister et que $f$ doit avoir un point fixe.
+
+\begin{definition}[Foncteur contravariant]
+	Un foncteur contravariant $F$ de $C$ à $D$ est un foncteur $F : C^{\msf{op}} \rightarrow D$.
+	Un morphisme dans le domaine du foncteur $F : C^{\msf{op}} \rightarrow D$ sera toujours représenté par une flèche $f : c' \rightarrow c$ dans $C$.
+
+	\begin{center}
+		\begin{tikzcd}
+			C^{\msf{op}} \arrow[r, "F"] & D
+		\end{tikzcd}
+	\end{center}
+
+	\marginnote{
+		\vspace{-2cm}
+		\begin{definition}
+			Soient $C$ et $D$ des catégorie, alors il existe une catégorie produit $C \times D$ dont :
+			\begin{itemize}
+				\item[(i)] les objets sont des paires ordonnées $(c, d)$ où $c$ est un objet de $C$ et $d$ un objet de $D$
+				\item[(ii)] les morphismes sont des paires ordonnées $(f, g) : (c, d) \rightarrow (c', d')$ avec $f : c \rightarrow c' \in C$ et $g : d \rightarrow d' \in D$
+			\end{itemize}
+		\end{definition}
+	}
+
+\end{definition}
+
+\begin{itemize}
+	\item[(i)] Le foncteur contravariant $P : \msf{Set}^{\msf{op}} \rightarrow \msf{Set}$ associe un ensemble à son ensemble de partitions $P(A)$ et une fonction $f : A \rightarrow B$ à son image inverse $f^{-1} : P(B) \rightarrow P(A)$ qui associe $B' \subset B$ à $f^{-1}(B') \subset A$.
+	\item[(ii)] Soit $C$, une catégorie petite, un foncteur $C^{\msf{op}} \rightarrow \msf{Set}$ est un \flqq{} préfaisceau\sidenote{Nous y reviendrons dans la section consacrée aux faisceaux.} \frqq{} sur $C$.
+		Un exemple typique est le foncteur $\mcf{O}(X)^\msf{op} \rightarrow \msf{Set}$ dont le domaine est l'ensemble partiellement ordonné $\mcf{O}(X)$ des sous-ensembles ouverts d'un espace topologique $X$ et dont la valeur à $U \subset X$ est l'ensemble des fonction réels continus sur $U$.
+		L'opération sur les morphismes est pas restriction.
+		Ce préfaisceau est dit un \flqq{} faisceau \frqq{}.
+\end{itemize}
+
+\section{Transformations naturelles}
+
+Considérons la catégorie $\msf{Vect}_\Bbbk^{\msf{fd}}$ des $\Bbbk$-espaces
+vectoriels de dimension finie. Tout objet $\mcf{V} \in
+	\msf{Vect}_\Bbbk^{\msf{fd}}$ est isomorphe à son dual linéaire $\mcf{V}^* =
+	\msf{Hom}(\mcf{V}, \Bbbk)$ (la dimension de $\mcf{V}^*$ est égale à celle de
+$\mcf{V}$). Cela peut être prouvé en construisant explicitement une base duale:
+on choisit une base $e_1, \dots, e_n$ pour $\mcf{V}$ et on définit ensuite
+$e_1^*, \dots, e_n^* \in \mcf{V}^*$ par
+\[ e_i^* (e_j) = \begin{cases} 1 & i = j \\ 0 & i \neq j \end{cases} \]
+
+La collection d'éléments $e_1^*, \dots, e_n^*$ permet de définir une base sur
+$\mcf{V}$ et l'application $e_i \mapsto e_i^*$ définit par linéarité un
+isomorphisme $\mcf{V} \simeq \mcf{V}^*$.
+
+\vspace{5pt}
+
+Considérons maintenant la construction analogue du double dual $V^{**} =
+	\msf{Hom}(\msf{Hom}(\mcf{V}, \Bbbk), \Bbbk)$ de $\mcf{V}$. Si $\mcf{V}$ est de
+dimension fini, alors l'isomorphisme $\mcf{V} \simeq \mcf{V}^*$ est transporté
+par le foncteur d'espace vectoriel dual \[ (-)^* : \msf{Vec}_\Bbbk^{\msf{op}} \rightarrow \msf{Vect}_\Bbbk \] vers un isomorphisme $\mcf{V}^* \simeq \mcf{V}^{**}$. La composition $V \simeq
+	\mcf{V}^{**}$ permet d'associer la base $e_1, \dots, e_n$ à la base 2-duale
+$e_1^{**}, \dots, e_n^{**}$. \vspace{5pt}
+
+Néanmoins, cet isomorphisme a une description plus simple. $\forall v : \in
+	\mcf{V}$, la « fonction d'évaluation »
+\[ f \mapsto f(v) : \mcf{V}^* \xrightarrow{\msf{ev}_v} \Bbbk \] définit une fonctionnelle linéaire sur $\mcf{V}^*$. Il s'avère que
+l'affectation $v \mapsto \msf{ev}_v$ définit un isomorphisme linéaire $\mcf{V}
+	\simeq \mcf{V}$, cette fois ne nécessitant pas un choix d'une base\sidenote{En
+fait, $e_i^{**}(e_j^*) = e_j^*(e_i) = \mcf{ev}_{e_i}(e_j^*)$ et donc les deux
+isomorphismes $\mcf{V} \simeq \mcf{V}^{**}$ – c'est seulement notre description
+qui s'est améliorée. }.
+
+\marginnote{
+	Un isomorphisme naturel est une transformation naturelle $\alpha : F \Rightarrow G$ dans lequel tout composant $\alpha_c$ est un isomorphisme.
+	On peut alors écrire $\alpha : F \simeq G$.
+}
+\begin{definition}[Transformation naturelle]
+	Soit $C$ et $D$ des catégories et $F, G, : C \rightrightarrows D$ des foncteurs, une transformation naturelle $\alpha : F \Rightarrow G$ est une famille de morphismes $\alpha_c : Fc \rightarrow Gc$ dans $D$ pour chaque objet $c:C$, telle que, pour tout morphisme $f : c \rightarrow c'$ dans $C$, le carré suivant des morphismes dans $D$
+
+	\begin{center}
+		\begin{tikzcd}
+			Fc \arrow[r, "\alpha_c"] \arrow[d, "Ff", swap] & Gc \arrow[d, "Gf"] \\
+			Fc' \arrow[r, "\alpha_{c'}"] & Gc'
+		\end{tikzcd}
+	\end{center}
+
+	commute, c-à-d, si $D$ admet un morphisme $Fc \rightarrow Gc'$ \sidenote{ Cette
+		condition de naturalité ne peut être énoncé avec moins de précision : elle se
+		réfère à chaque objet et à chaque morphisme dans la catégorie de domaine et est
+		décrite à l'aide des images dans la catégorie de codomaine. \vspace{5pt}
+
+		Les données nécessaires pour définir une transformation naturelle $\alpha$ sont
+		souvent représenté dans un digramme :
+
+		\begin{center}
+			\begin{tikzcd}[ampersand replacement=\&]
+				C \arrow[r, "F", bend left=40, ""{name=U, below}]{}
+				\arrow[r, "G", bend right=35, swap, ""{name=D, above}]{} \& D \arrow[Rightarrow, from=U, to=D]
+			\end{tikzcd}
+		\end{center}
+	}.
+\end{definition}
+
+En pratique, il est généralement plus élégant de définir une transformation
+naturelle en disant que la collection $X$ des morphismes définit les composants
+d'une transformation naturelle, laissant implicitement les choix du domaine et
+codomaine des foncteurs, et des catégories source et cible. \vspace{5pt}
+
+Ici $X$ devrait être une collection de morphismes dans une catégorie (cible)
+clairement identifiable, dont les domaines et codomaines sont définis en
+utilisant une « variable » commune (un objet de la catégorie source). Si cette
+variable est $c$, on pourrait affirmer que les morphismes $X$ sont naturels
+dans $c$. \vspace{5pt}
+
+Nonobstant, la totalité des données des catégories sources et cibles, de la
+paire de foncteurs parallèles, et les composantes doivent doivent toujours être
+considérées comme faisant partie de la transformation naturelle.
+
+\begin{itemize}
+	\item[(i)] Pour des espaces vectoriels de n'importe quelle dimension, l'application $\msf{ev} : \mcf{V} \rightarrow \mcf{V}^{**}$ qui transporte un élément $v \in \mcf{V}$ à la fonction linéaire $\msf{ev}_v : \mcf{V}^* \rightarrow \Bbbk$ définit les composantes d'une transformation naturelle de l'endofoncteur sur $\msf{Vect}_\Bbbk$ au double foncteur dual.
+		Pour vérifier que le carré naturel
+		\begin{center}
+			\begin{tikzcd}[ampersand replacement=\&]
+				\mcf{V} \arrow[d, "\phi"] \arrow[r, "\msf{ev}"] \& \mcf{V}^{**} \arrow[d, "\phi^{**}"] \\
+				\mcf{W} \arrow[r, "\msf{ev}"] \& \mcf{W}^{**}
+			\end{tikzcd}
+		\end{center}
+		commute pour n'importe quelle application linéaire $\phi : \mcf{V} \rightarrow \mcf{W}$, il suffit de considérer les images d'un vecteur générique $v \in \mcf{V}$.
+		Par définition, $\msf{ev}_{\phi v} : \mcf{W}^* \rightarrow \Bbbk$ transporte une fonction $f : \mcf{W} \rightarrow \Bbbk$ à $f(\phi v)$.
+		\hfill
+		\textbf{TODO : finir la démo}
+
+	\item[(ii)] En contraste, le foncteur identité et le seul foncteur dual sur les espaces vectoriels de dimension finie ne sont pas naturellement isomorphes.
+		En effet, le foncteur identité est covariant tandis que le foncteur dual est contravariant.
+		De plus, l'isomorphisme $\mcf{V} \simeq \mcf{V}^*$ peut être défini lorsque $\mcf{V}$ est fini nécessite un choix d'une base, qui n'est essentiellement préservé par aucunes application linéaire (et plus généralement par aucun endomorphisme linéaire autre que l'identité).
+	\item[(iii)] Il existe une transformation naturelle $\eta : 1_\msf{Set} \Rightarrow P$ de la fonction identité
+\end{itemize}
+
+\section{Limites et Colimites}
+
+À partir d'un espace euclidien $\mbbf{R}$ avec sa métrique habituelle, on peut construire une grande variété de nouveaux espaces.
+Par exemple, en prenant les produit de $\mbbf{R}$ avec lui-même, on obtient les espaces euclidiens $\mbbf{R}^n$ en dimensions finies qui possèdent eux-mêmes des sous-espaces intéressants, définis comme étant les solutions de certaines fonctions polynomiales continues $\mbbf{R}^n \rightarrow \mbbf{R}$, y compris la sphère $\mbf{S}^{n-1}$ qui délimite le disque fermé $\mbf{D}^n$.
+
+\vspace{5pt}
+
+A partir de sphères et de disques, on peut construire des tores, le ruban de
+Möebius, la bouteille de Klein, et plus généralement tout complexe cellulaire.
+Dans chacun des cas, l'objet construit est un ensemble particulier doté d'une
+topologie spécifique et toutes ces topologiques peuvent être définies de
+manière uniforme, via une propriété universelle qui caractérise l'espace
+nouvellement créé, soit comme une limite ou colimite d'un diagramme particulier
+dans la catégorie des espaces topologiques.
+
+Les limites et les colimites, peuvent être définies dans n'importe quelle
+catégorie.
+
+\marginnote{
+	Explicitement :
+	\begin{itemize}
+		\item[$\bullet$]
+			La donnée d'un cône sur un diagramme $F : \msf{J} \to \msf{C}$ avec pour sommet $c$ est une collection de morphismes $\lambda_j : c \to F_j$ indexés par les objets $j \in \msf{J}$.
+		\item[$\bullet$]
+			Une famille de morphismes $(\lambda_j : c \to F_j)_{j \in \msf{J}}$ définit un cône sur $F$ si et seulement si, pour chaque morphisme $f : j \to k$  dans $\msf{J}$, le triangle suivant commute dans $\msf{C}$.
+	\end{itemize}
+
+	\begin{center}
+		\begin{tikzcd}[ampersand replacement=\&]
+			\& c \arrow[ld, "\lambda_j", swap] \arrow[rd, "\lambda_k"] \& \\
+			F_j \arrow[rr, "F_f"] \& \& F_k
+		\end{tikzcd}
+	\end{center}
+}
+\begin{definition}[Cône]
+	Soit $\msf{J}$ une catégorie « indexée » (dans le sens où elle ne possède aucune propriété particulière à la manière d'un ensemble indexé) et $\msf{C}$ une catégorie arbitraire.
+	Un diagramme de forme $\msf{J}$ dans $\msf{C}$ est un foncteur $F : \msf{J} \rightarrow \msf{C}$.
+	Un cône sur un diagramme $F : \msf{J} \to \msf{C}$ avec pour sommet $c \in \msf{C}$ est une transformation naturelle $\lambda : c \implies F$ où le domaine est foncteur constant à $c$.
+	Les composants $(\lambda_j : c \to F_j)_{j \in \msf{J}}$ des transformations naturelles sont les « pattes » du cône.
+
+	\begin{definition}{Limite}
+		Pour tout diagramme $F : \msf{J} \to \msf{C}$, une limite est un objet terminal dans la catégorie des cônes sur $F$, c.-à-d., $\int Cone(–, F)$.
+		Un objet dans $\int Cone(–, F)$ est un cône sur $F$ pour n'importe quel sommet.
+		En particulier, la donnée d'un objet terminal dans $\int Cone(–, F)$ est un objet limite accompagné d'un cône limite.
+
+		Un morphisme d'un cône $\lambda : c \implies F$ vers un cône $\mu : d \implies
+			F$ est un morphisme $f : c \to d$ dans $\msf{C}$ tel que pour tout $j \in
+			\msf{J}$, $\mu_j \cdot f = \lambda_j$. En d'autres termes, un morphisme de cône
+		est une application entre les sommets telle que chaque « patte » du cône
+		domaine est translatée à travers la « patte » correspondante dans le cône
+		codomaine.
+	\end{definition}
+	\begin{center}
+		\begin{tikzcd}
+			& & & c \arrow[llldd, "\dots", swap] \arrow[lldd, "\lambda_{-2}" description] \arrow[ldd, "\lambda_{-1}" description] \arrow[rdd, "\lambda_1" description] \arrow[rrdd, "\lambda_2" description]\arrow[rrrdd, "\dots"] \arrow[d, "f"] \arrow[dd, bend left, "\lambda_0" description] & & & \\
+			& & & d \arrow[rrrd, "\dots"] \arrow[rrd, "\mu_2" description] \arrow[rd, "\mu_1" description] \arrow[llld, "\dots"] \arrow[lld, "\mu_{-2}" description] \arrow[ld, "\mu_{-1}" description] \arrow[d, "\mu_0" description] & & & \\
+			\dots \arrow[r] & F(-2) \arrow[r] & F(-1) \arrow[r] & F(O) \arrow[r] & F(1) \arrow[r] & F(2) \arrow[r] & \dots
+		\end{tikzcd}
+	\end{center}
+
+	%Un cône sur un diagramme $F : \msf{J} \rightarrow \msf{C}$ est un objet $N \in \msf{C}$ avec une famille de morphismes $\psi_X : N \to F(X)$ indexés par les objets $X$ de $J$ tel que pour tout morphisme $f : X \to Y$ dans $J$, on a $F(f) \circ \psi_X = \psi_Y$
+
+	\vspace{5pt}
+
+\end{definition}
+
+\end{document}
